@@ -112,7 +112,7 @@ export async function loadProducts() {
     return products;
   } catch (error) {
     console.log('Unexpected error. Please try again later.');
-    return products;
+    throw error;
   }
 }
 

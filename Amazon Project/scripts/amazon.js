@@ -95,8 +95,41 @@ function updateCartQuantity() {
   }
 }
 
+function showProductsLoadingState() {
+  const productsGrid = document.querySelector('.js-products-grid');
+
+  if (!productsGrid) {
+    return;
+  }
+
+  productsGrid.innerHTML = `
+    <div class="products-status products-loading">
+      Loading products...
+    </div>
+  `;
+}
+
+function showProductsErrorState() {
+  const productsGrid = document.querySelector('.js-products-grid');
+
+  if (!productsGrid) {
+    return;
+  }
+
+  productsGrid.innerHTML = `
+    <div class="products-status products-error">
+      Something went wrong while loading products. Please try again.
+    </div>
+  `;
+}
+
 function renderProducts() {
   let productsHTML = "";
+
+  if (!products.length) {
+    showProductsErrorState();
+    return;
+  }
 
   products.forEach((product) => {
     productsHTML += `
@@ -165,6 +198,17 @@ function renderProducts() {
   });
 }
 
-loadProductsFetch().then(() => {
-  renderProducts();
-});
+showProductsLoadingState();
+
+loadProductsFetch()
+  .then(() => {
+    if (!products.length) {
+      showProductsErrorState();
+      return;
+    }
+
+    renderProducts();
+  })
+  .catch(() => {
+    showProductsErrorState();
+  });
