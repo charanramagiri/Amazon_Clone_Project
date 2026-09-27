@@ -81,16 +81,7 @@ export function updateDeliveryOption(productId, deliveryOptionId) {
 
 export async function loadCart(callback) {
   try {
-    const response = await fetch('https://supersimplebackend.dev/cart');
-
-    if (!response.ok) {
-      throw new Error('Request failed');
-    }
-
-    const cartData = await response.json();
-
-    cart = normalizeCartItems(cartData);
-    saveToStorage();
+    loadFromStorage();
 
     if (typeof callback === 'function') {
       callback();
@@ -98,7 +89,7 @@ export async function loadCart(callback) {
 
     return cart;
   } catch (error) {
-    console.log('Unexpected error. Please try again later.');
+    console.error('Unable to load cart from local storage.', error);
 
     if (typeof callback === 'function') {
       callback();

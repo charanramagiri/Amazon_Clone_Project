@@ -77,22 +77,17 @@ export function renderPaymentSummary() {
     placeOrderButton.classList.add('is-disabled');
 
     try {
-      const response = await fetch('https://supersimplebackend.dev/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          cart: cart
-        })
-      });
+      const order = {
+        id: `order-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        totalCents: 0,
+        cart: [...cart]
+      };
 
-      const order = await response.json();
       addOrder(order);
       window.location.href = 'orders.html';
-
     } catch (error) {
-      console.log('Unexpected error. Try again later.');
+      console.error('Unexpected error. Try again later.', error);
       placeOrderButton.disabled = false;
       placeOrderButton.textContent = 'Place your order';
       placeOrderButton.classList.remove('is-disabled');
