@@ -82,19 +82,17 @@
 //     });
 //   });
 
-import { cart, addToCart } from "../data/cart.js";
+import { cart, addToCart, getCartCount } from "../data/cart.js";
 import { products, loadProductsFetch } from "../data/products.js";
 import { formatCurrency } from "./utils/money.js";
 
-// Move updateCartQuantity outside renderProducts
 function updateCartQuantity() {
-  let cartQuantity = 0;
+  const cartQuantity = getCartCount();
+  const cartQuantityElement = document.querySelector(".js-cart-quantity");
 
-  cart.forEach((cartItem) => {
-    cartQuantity += cartItem.quantity;
-  });
-
-  document.querySelector(".js-cart-quantity").innerHTML = cartQuantity;
+  if (cartQuantityElement) {
+    cartQuantityElement.innerHTML = cartQuantity;
+  }
 }
 
 function renderProducts() {

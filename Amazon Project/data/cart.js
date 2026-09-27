@@ -1,20 +1,34 @@
-export let cart;
+export let cart = [];
 
-loadFromStorage();
+function normalizeCartItems(items) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items
+    .filter((item) => item && typeof item === 'object')
+    .map((item) => ({
+      productId: typeof item.productId === 'string' ? item.productId : '',
+      quantity: Number.isFinite(item.quantity) ? Math.max(1, Number(item.quantity)) : 1,
+      deliveryOptionId: typeof item.deliveryOptionId === 'string' ? item.deliveryOptionId : '1'
+    }))
+    .filter((item) => item.productId);
+}
+
+export function getCartCount() {
+  return cart.reduce((total, cartItem) => total + (Number(cartItem.quantity) || 0), 0);
+}
 
 export function loadFromStorage() {
-  cart = JSON.parse(localStorage.getItem('cart'));
+  try {
+    const savedCart = JSON.parse(localStorage.getItem('cart'));
+    cart = normalizeCartItems(savedCart);
+  } catch (error) {
+    cart = [];
+  }
 
-  if (!cart) {
-    cart = [{
-      productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
-      quantity: 2,
-      deliveryOptionId: '1'
-    }, {
-      productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
-      quantity: 1,
-      deliveryOptionId: '2'
-    }];
+  if (cart.length === 0) {
+    cart = [];
   }
 }
 
@@ -23,6 +37,8 @@ function saveToStorage() {
 }
 
 export function addToCart(productId) {
+  cart = normalizeCartItems(cart);
+
   let matchingItem;
 
   cart.forEach((cartItem) => {
@@ -45,27 +61,18 @@ export function addToCart(productId) {
 }
 
 export function removeFromCart(productId) {
-  const newCart = [];
-
-  cart.forEach((cartItem) => {
-    if (cartItem.productId !== productId) {
-      newCart.push(cartItem);
-    }
-  });
-
-  cart = newCart;
-
+  cart = normalizeCartItems(cart).filter((cartItem) => cartItem.productId !== productId);
   saveToStorage();
 }
 
 export function updateDeliveryOption(productId, deliveryOptionId) {
-  let matchingItem;
+  cart = normalizeCartItems(cart);
 
-  cart.forEach((cartItem) => {
-    if (productId === cartItem.productId) {
-      matchingItem = cartItem;
-    }
-  });
+  const matchingItem = cart.find((cartItem) => cartItem.productId === productId);
+
+  if (!matchingItem) {
+    return;
+  }
 
   matchingItem.deliveryOptionId = deliveryOptionId;
 
@@ -82,10 +89,8 @@ export async function loadCart(callback) {
 
     const cartData = await response.json();
 
-    if (Array.isArray(cartData) && cartData.length > 0) {
-      cart = cartData;
-      saveToStorage();
-    }
+    cart = normalizeCartItems(cartData);
+    saveToStorage();
 
     if (typeof callback === 'function') {
       callback();
@@ -102,3 +107,5 @@ export async function loadCart(callback) {
     return cart;
   }
 }
+
+loadFromStorage();
