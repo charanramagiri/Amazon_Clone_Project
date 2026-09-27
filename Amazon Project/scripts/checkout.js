@@ -1,31 +1,75 @@
 import {renderOrderSummary} from './checkout/orderSummary.js';
 import {renderPaymentSummary} from './checkout/paymentSummary.js';
-import {loadProducts} from '../data/products.js';
+import {loadProducts, loadProductsFetch} from '../data/products.js';
 import {loadCart} from '../data/cart.js';
-import { renderString } from './app.js';
-
-function showCheckoutLoadingState() {
-  renderString('.js-order-summary', '<div class="checkout-status-message">Loading your order...</div>');
-  renderString('.js-payment-summary', '<div class="checkout-status-message">Loading payment summary...</div>');
-}
-
-function showCheckoutErrorState() {
-  renderString('.js-order-summary', '<div class="checkout-status-message checkout-error-message">Unable to load your order right now. Please try again.</div>');
-  renderString('.js-payment-summary', '<div class="checkout-status-message checkout-error-message">Unable to load payment details right now.</div>');
-}
+// import '../data/cart-class.js';
+// import '../data/backend-practice.js';
 
 async function loadPage() {
-  showCheckoutLoadingState();
-
   try {
-    await loadProducts();
-    await loadCart();
-    renderOrderSummary();
-    renderPaymentSummary();
+    // throw 'error1';
+
+    await loadProductsFetch();
+
+    const value = await new Promise((resolve, reject) => {
+      // throw 'error2';
+      loadCart(() => {
+        // reject('error3');
+        resolve('value3');
+      });
+    });
+
   } catch (error) {
     console.log('Unexpected error. Please try again later.');
-    showCheckoutErrorState();
   }
-}
 
+  renderOrderSummary();
+  renderPaymentSummary();
+}
 loadPage();
+
+/*
+Promise.all([
+  loadProductsFetch(),
+  new Promise((resolve) => {
+    loadCart(() => {
+      resolve();
+    });
+  })
+
+]).then((values) => {
+  console.log(values);
+  renderOrderSummary();
+  renderPaymentSummary();
+});
+*/
+
+/*
+new Promise((resolve) => {
+  loadProducts(() => {
+    resolve('value1');
+  });
+
+}).then((value) => {
+  console.log(value);
+
+  return new Promise((resolve) => {
+    loadCart(() => {
+      resolve();
+    });
+  });
+
+}).then(() => {
+  renderOrderSummary();
+  renderPaymentSummary();
+});
+*/
+
+/*
+loadProducts(() => {
+  loadCart(() => {
+    renderOrderSummary();
+    renderPaymentSummary();
+  });
+});
+*/

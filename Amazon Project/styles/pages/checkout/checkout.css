@@ -200,21 +200,6 @@
   padding-top: 18px;
 }
 
-.checkout-status-message {
-  padding: 18px 12px;
-  border: 1px solid rgb(222, 222, 222);
-  border-radius: 8px;
-  background: rgb(248, 248, 248);
-  color: rgb(33, 33, 33);
-  font-size: 15px;
-  text-align: center;
-}
-
-.checkout-error-message {
-  color: rgb(177, 39, 4);
-  background: rgb(255, 245, 243);
-}
-
 .place-order-button {
   width: 100%;
   padding-top: 12px;
@@ -223,11 +208,4 @@
 
   margin-top: 11px;
   margin-bottom: 15px;
-}
-
-.place-order-button:disabled,
-.place-order-button.is-disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  pointer-events: none;
 }

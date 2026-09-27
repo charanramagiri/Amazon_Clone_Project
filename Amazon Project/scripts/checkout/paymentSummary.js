@@ -61,7 +61,7 @@ export function renderPaymentSummary() {
       </div>
     </div>
 
-    <button class="place-order-button button-primary js-place-order-button">
+    <button class="place-order-button button-primary">
       Place your order
     </button>
   `;
@@ -69,29 +69,29 @@ export function renderPaymentSummary() {
   document.querySelector('.js-payment-summary')
     .innerHTML = paymentSummaryHTML;
 
-  const placeOrderButton = document.querySelector('.js-place-order-button');
 
-  placeOrderButton.addEventListener('click', async () => {
-    placeOrderButton.disabled = true;
-    placeOrderButton.textContent = 'Processing...';
-    placeOrderButton.classList.add('is-disabled');
+  
+  document.querySelector('.js-place-order')
+    .addEventListener('click', async () => {
+      try {
+        const response = await fetch('https://supersimplebackend.dev/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            cart: cart
+          })
+        });
 
-    try {
-      const order = {
-        id: `order-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        totalCents: 0,
-        cart: [...cart]
-      };
+        const order = await response.json();
+        addOrder(order);
 
-      addOrder(order);
+      } catch (error) {
+        console.log('Unexpected error. Try again later.');
+      }
+
       window.location.href = 'orders.html';
-    } catch (error) {
-      console.error('Unexpected error. Try again later.', error);
-      placeOrderButton.disabled = false;
-      placeOrderButton.textContent = 'Place your order';
-      placeOrderButton.classList.remove('is-disabled');
-    }
-  });
+    });
 
 }
